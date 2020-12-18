@@ -1,0 +1,6 @@
+# a regular table
+[a]
+
+[b] # table with comment
+
+  [indented]
