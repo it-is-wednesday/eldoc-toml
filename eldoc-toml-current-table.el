@@ -2,14 +2,18 @@
 ;;
 ;; Copyright (C) 2020 Ma'or Kadosh
 ;;
+;; Author: Ma'or Kadosh <maor@avocadosh.xyz>
+;; URL: https://github.com/it-is-wednesday/eldoc-toml-current-table
+;; Version: 0.1
+;; Package-Requires: ((emacs "24.4") (dash "2.17"))
+;; Keywords: toml, eldoc
+;;
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; Commentary:
 ;;
 ;;  Display the table name the field at point belongs to. Intended to ease navigation of large
 ;;  tables with many fields, where its header might get out of screen.
-;;
-;;; Package-Requires: ((dash "2.17.0") (Emacs "24"))
 ;;
 ;;; Code:
 
