@@ -8,6 +8,6 @@ while still navigating its fields. Depends on dash.
 ** Installation
 Install [[https://github.com/magnars/dash.el][dash.el]], then clone this repo and add the following to your init file:
 #+BEGIN_SRC emacs-lisp
-(load-file "/path/toeldoc-toml-current-table.el/")
-(add-hook 'conf-toml-mode-hook #'eldoc-toml-current-table-setup-eldoc)
+(load-file "/path/to/eldoc-toml-current-table.el/")
+(add-hook 'conf-toml-mode-hook #'eldoc-toml-current-table)
 #+END_SRC

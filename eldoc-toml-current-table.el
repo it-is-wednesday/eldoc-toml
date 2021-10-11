@@ -6,7 +6,7 @@
 ;; URL: https://github.com/it-is-wednesday/eldoc-toml-current-table
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "24.4") (dash "2.17"))
-;; Keywords: toml, eldoc
+;; Keywords: data
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
@@ -40,10 +40,11 @@ Add it to `eldoc-documentation-functions'."
       ;; Trimming since TOML lines can begin with whitespace
       (funcall callback (concat "In table: " table)))))
 
-(defun eldoc-toml-current-table-setup-eldoc ()
+;;;###autoload
+(defun eldoc-toml-current-table ()
   "Add the hook to `eldoc-documentation-functions'."
-  (add-hook 'eldoc-documentation-functions #'eldoc-toml-current-table--callback nil t))
+  (interactive)
+  (add-hook 'eldoc-documentation-functions #'eldoc-toml-current-table--callback nil 'local))
 
-
-(provide 'eldoc-toml-current-table-setup-eldoc)
+(provide 'eldoc-toml-current-table)
 ;;; eldoc-toml-current-table.el ends here
