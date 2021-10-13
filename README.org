@@ -1,13 +1,12 @@
 * eldoc-toml-current-table
 An ElDoc function for displaying the parent table of the field at point in a TOML file. Makes it
 easier to navigate tables with many fields, where you might have the table's header off screen
-while still navigating its fields. Depends on dash.
+while still navigating its fields.
 
 [[./screenshot.png]]
 
 ** Installation
-Install [[https://github.com/magnars/dash.el][dash.el]], then clone this repo and add the following to your init file:
 #+BEGIN_SRC emacs-lisp
-(load-file "/path/to/eldoc-toml-current-table.el/")
+(load-file "/path/to/eldoc-toml-current-table.el")
 (add-hook 'conf-toml-mode-hook #'eldoc-toml-current-table)
 #+END_SRC

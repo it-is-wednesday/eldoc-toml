@@ -40,6 +40,8 @@ returns [a]."
       (setq current-line (thing-at-point 'line 'no-properties)))
 
     (goto-char initial-point)
+
+    ;; Trimming since TOML lines can begin with whitespace
     (string-trim (eldoc-toml-current-table--remove-comment current-line))))
 
 (defun eldoc-toml-current-table--callback (callback &rest _more)
@@ -49,7 +51,6 @@ Add it to `eldoc-documentation-functions'."
     ;; make sure we got some table value, because some TOML documents begin with comments - in
     ;; which case we should just be quiet.
     (when table
-      ;; Trimming since TOML lines can begin with whitespace
       (funcall callback (concat "In table: " table)))))
 
 ;;;###autoload
