@@ -12,8 +12,9 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Display the table name the field at point belongs to. Intended to ease navigation of large
-;;  tables with many fields, where its header might get out of screen.
+;; An ElDoc function for displaying the parent table of the field at point in a TOML file, along the
+;; key name. Makes it easier to navigate tables with many fields, where you might have the table’s
+;; header or the key name off screen while still navigating its fields.
 ;;
 ;;; Code:
 
