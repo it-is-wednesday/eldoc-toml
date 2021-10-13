@@ -17,6 +17,8 @@
 ;;
 ;;; Code:
 
+(require 'cl-lib)
+
 (defun eldoc-toml--remove-comment (line)
   "Remove comment from end of LINE.
 Also remove any space between the actual line's ending to the comment's beginning."
@@ -32,36 +34,63 @@ X
 
 returns [a].
 
-Returns the string to be displayed by eldoc: 'In table: [tablename]'.
-If we aren't under any table (before the first table of the file), returns nil."
-  (let ((initial-point (point))
-        (line (thing-at-point 'line 'no-properties)))
-
+Returns the table's name. If we aren't under any table (before the first table
+of the file), returns nil."
+  (let ((initial-point (point)))
+    (defvar t/line)
+    (defvar t/result)
     ;; Iterate from current line backwards until we hit a table line or until the first line
-    (while (and line (not (string-match-p "^\s*\\[" line)))
-      (forward-line -1)
+    (cl-loop (setq t/line (thing-at-point 'line 'no-properties))
+             (when (string-match-p "^\s*\\[" t/line)
+               ;; Trimming since TOML lines can begin with whitespace
+               (setq t/result (string-trim (eldoc-toml--remove-comment t/line)))
+               (cl-return))
 
-      (setq line (thing-at-point 'line 'no-properties))
+             ;; Return nil if we reached the beginning of the buffer without any matching line
+             (when (<= (line-number-at-pos) 1)
+               (setq t/result nil)
+               (cl-return))
 
-      ;; Set line to nil if we reached the beginning of the buffer without any matching line
-      (when (<= (line-number-at-pos) 1)
-        (setq line nil)))
+             (forward-line -1))
 
     (goto-char initial-point)
 
-    (if line
-        ;; Trimming since TOML lines can begin with whitespace
-        (concat "In table: " (string-trim (eldoc-toml--remove-comment line)))
-      nil)))
+    t/result))
+
+(defun eldoc-toml--current-key-name ()
+  "Return the current key name."
+  (let ((initial-point (point)))
+    (defvar k/line)
+    (defvar k/result)
+    ;; Iterate from current line backwards until we see key definition: xxx = ...
+    (cl-loop (setq k/line (thing-at-point 'line 'no-properties))
+
+             (when (string-match-p ".+\s*=" k/line)
+               ;; Remove everything in the matching line except the key name
+               (setq k/result (string-trim (replace-regexp-in-string "\s*=.*" "" k/line)))
+               (cl-return))
+
+             ;; Return nil if we reached the beginning of the buffer without any matching line
+             (when (<= (line-number-at-pos) 1)
+               (setq k/result nil)
+               (cl-return))
+
+             (forward-line -1))
+
+    (goto-char initial-point)
+
+    k/result))
 
 (defun eldoc-toml--callback (callback &rest _more)
   "Document the table the value at point is in and pass it to CALLBACK.
 Add this to `eldoc-documentation-functions'."
-  (let ((table (eldoc-toml--current-table-name)))
+  (let* ((table (eldoc-toml--current-table-name))
+         (key (eldoc-toml--current-key-name))
+         (key-str (if key (concat "." key))))
     ;; make sure we got some table value, because some TOML documents begin with comments - in
     ;; which case we should just be quiet.
-    (when table
-      (funcall callback table))))
+    (if table
+        (funcall callback (concat table key-str)))))
 
 ;;;###autoload
 (defun eldoc-toml ()

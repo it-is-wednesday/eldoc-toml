@@ -4,3 +4,11 @@
 [b] # table with comment
 
   [indented]
+
+x = 1
+y = [
+  "1",
+  "5",
+  "3",
+  "9",
+]
