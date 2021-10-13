@@ -6,6 +6,7 @@
 ;; URL: https://github.com/it-is-wednesday/eldoc-toml
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "24.4"))
+;; SPDX-License-Identifier: GPL-3.0-or-later
 ;; Keywords: data
 ;;
 ;; This file is not part of GNU Emacs.
