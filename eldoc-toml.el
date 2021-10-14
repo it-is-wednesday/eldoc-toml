@@ -19,6 +19,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'subr-x)
 
 (defun eldoc-toml--remove-comment (line)
   "Remove comment from end of LINE.
