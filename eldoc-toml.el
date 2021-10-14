@@ -42,21 +42,20 @@ of the file), returns nil."
     (defvar t/line)
     (defvar t/result)
 
-    ;; Iterate from current line backwards until we hit a table line or until the first line
-    (cl-loop (setq t/line (thing-at-point 'line 'no-properties))
+    (setq t/result
+          ;; Iterate from current line backwards until we hit a table line or until the first line
+          (cl-loop (setq t/line (thing-at-point 'line 'no-properties))
 
-             ;; return line if it's a table header
-             (when (string-match-p "^\s*\\[" t/line)
-               ;; Trimming since TOML lines can begin with whitespace
-               (setq t/result (string-trim (eldoc-toml--remove-comment t/line)))
-               (cl-return))
+                   ;; return line if it's a table header
+                   (when (string-match-p "^\s*\\[" t/line)
+                     ;; Trimming since TOML lines can begin with whitespace
+                     (cl-return (string-trim (eldoc-toml--remove-comment t/line))))
 
-             ;; Return nil if we reached the beginning of the buffer without any matching line
-             (when (<= (line-number-at-pos) 1)
-               (setq t/result nil)
-               (cl-return))
+                   ;; Return nil if we reached the beginning of the buffer without any matching line
+                   (when (<= (line-number-at-pos) 1)
+                     (cl-return nil))
 
-             (forward-line -1))
+                   (forward-line -1)))
 
     (goto-char initial-point)
 
@@ -70,26 +69,24 @@ If no such line was found (meaning we're at the top of the doc), returns nil."
     (defvar k/line)
     (defvar k/result)
 
-    ;; Iterate from current line backwards until we see key definition: xxx = ...
-    (cl-loop (setq k/line (thing-at-point 'line 'no-properties))
+    (setq k/result
+          ;; Iterate from current line backwards until we see key definition: xxx = ...
+          (cl-loop (setq k/line (thing-at-point 'line 'no-properties))
 
-             ;; Return line if it's a decleration line
-             (when (string-match-p ".+\s*=" k/line)
-               ;; Remove everything in the matching line except the key name
-               (setq k/result (string-trim (replace-regexp-in-string "\s*=.*" "" k/line)))
-               (cl-return))
+                   ;; Return line if it's a decleration line
+                   (when (string-match-p ".+\s*=" k/line)
+                     ;; Remove everything in the matching line except the key name
+                     (cl-return (string-trim (replace-regexp-in-string "\s*=.*" "" k/line))))
 
-             ;; Return nil if we reached the beginning of the buffer without any matching line
-             (when (<= (line-number-at-pos) 1)
-               (setq k/result nil)
-               (cl-return))
+                   ;; Return nil if we reached the beginning of the buffer without any matching line
+                   (when (<= (line-number-at-pos) 1)
+                     (cl-return nil))
 
-             ;; Return nil if we aren't inside a long string/array/inline table
-             (when (eldoc-toml--toplevelp)
-               (setq k/result nil)
-               (cl-return))
+                   ;; Return nil if we aren't inside a long string/array/inline table
+                   (when (eldoc-toml--toplevelp)
+                     (cl-return nil))
 
-             (forward-line -1))
+                   (forward-line -1)))
 
     (goto-char initial-point)
 
