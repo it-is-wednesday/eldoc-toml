@@ -73,7 +73,7 @@ If no such line was found (meaning we're at the top of the doc), returns nil."
     ;; Iterate from current line backwards until we see key definition: xxx = ...
     (cl-loop (setq k/line (thing-at-point 'line 'no-properties))
 
-             ;; return line if it's a decleration line
+             ;; Return line if it's a decleration line
              (when (string-match-p ".+\s*=" k/line)
                ;; Remove everything in the matching line except the key name
                (setq k/result (string-trim (replace-regexp-in-string "\s*=.*" "" k/line)))
@@ -84,11 +84,36 @@ If no such line was found (meaning we're at the top of the doc), returns nil."
                (setq k/result nil)
                (cl-return))
 
+             ;; Return nil if we aren't inside a long string/array/inline table
+             (when (eldoc-toml--toplevelp)
+               (setq k/result nil)
+               (cl-return))
+
              (forward-line -1))
 
     (goto-char initial-point)
 
     k/result))
+
+(defun eldoc-toml--toplevelp ()
+  "Check if we're surrounded by brackets, parens, quotes...
+Merely checks if `backward-up-list' says we're at the top level or not.
+Returns t if we're at the top level, returns nil if we're surrounded by something."
+  (let ((initial-point (point)))
+    (defvar s/result)
+
+    (beginning-of-line)
+
+    (setq s/result
+          (condition-case nil
+              (progn
+                (backward-up-list 1 t)
+                nil)
+            (scan-error t)))
+
+    (goto-char initial-point)
+
+    s/result))
 
 (defun eldoc-toml--callback (callback &rest _more)
   "Document the table the value at point is in and pass it to CALLBACK.
