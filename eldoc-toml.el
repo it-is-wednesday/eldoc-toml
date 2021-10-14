@@ -105,10 +105,10 @@ Returns t if we're at the top level, returns nil if we're surrounded by somethin
     (beginning-of-line)
 
     (setq s/result
+          ;; Evaluates to t if cursor couldn't move out of one level of parentheses/quotes/xxx,
+          ;; meaning it's at the file's top level. Evaluates to nil otherwise.
           (condition-case nil
-              (progn
-                (backward-up-list 1 t)
-                nil)
+              (progn (backward-up-list 1 t) nil)
             (scan-error t)))
 
     (goto-char initial-point)
