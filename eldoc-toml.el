@@ -41,8 +41,11 @@ of the file), returns nil."
   (let ((initial-point (point)))
     (defvar t/line)
     (defvar t/result)
+
     ;; Iterate from current line backwards until we hit a table line or until the first line
     (cl-loop (setq t/line (thing-at-point 'line 'no-properties))
+
+             ;; return line if it's a table header
              (when (string-match-p "^\s*\\[" t/line)
                ;; Trimming since TOML lines can begin with whitespace
                (setq t/result (string-trim (eldoc-toml--remove-comment t/line)))
@@ -60,13 +63,17 @@ of the file), returns nil."
     t/result))
 
 (defun eldoc-toml--current-key-name ()
-  "Return the current key name."
+  "Return the current key name.
+Looks for a line that looks like xxx = yyy, and extracts xxx.
+If no such line was found (meaning we're at the top of the doc), returns nil."
   (let ((initial-point (point)))
     (defvar k/line)
     (defvar k/result)
+
     ;; Iterate from current line backwards until we see key definition: xxx = ...
     (cl-loop (setq k/line (thing-at-point 'line 'no-properties))
 
+             ;; return line if it's a decleration line
              (when (string-match-p ".+\s*=" k/line)
                ;; Remove everything in the matching line except the key name
                (setq k/result (string-trim (replace-regexp-in-string "\s*=.*" "" k/line)))
@@ -87,12 +94,14 @@ of the file), returns nil."
   "Document the table the value at point is in and pass it to CALLBACK.
 Add this to `eldoc-documentation-functions'."
   (let* ((table (eldoc-toml--current-table-name))
-         (key (eldoc-toml--current-key-name))
-         (key-str (if key (concat "." key))))
+         (key (eldoc-toml--current-key-name)))
     ;; make sure we got some table value, because some TOML documents begin with comments - in
     ;; which case we should just be quiet.
     (if table
-        (funcall callback (concat table key-str)))))
+        (funcall callback
+                 ;; If key: [table].key
+                 ;; otherwise: [table]
+                 (concat table (if key (concat "." key)))))))
 
 ;;;###autoload
 (defun eldoc-toml ()
