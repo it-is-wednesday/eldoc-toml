@@ -38,79 +38,59 @@ returns [a].
 
 Returns the table's name. If we aren't under any table (before the first table
 of the file), returns nil."
-  (let ((initial-point (point)))
-    (defvar t/line)
-    (defvar t/result)
+  (save-excursion
+    ;; Iterate from current line backwards until we hit a table line or until the first line
+    (cl-loop with line = (thing-at-point 'line 'no-properties) do
 
-    (setq t/result
-          ;; Iterate from current line backwards until we hit a table line or until the first line
-          (cl-loop (setq t/line (thing-at-point 'line 'no-properties))
+             ;; return line if it's a table header
+             (when (string-match-p "^\s*\\[" line)
+               ;; Trimming since TOML lines can begin with whitespace
+               (cl-return (string-trim (eldoc-toml--remove-comment line))))
 
-                   ;; return line if it's a table header
-                   (when (string-match-p "^\s*\\[" t/line)
-                     ;; Trimming since TOML lines can begin with whitespace
-                     (cl-return (string-trim (eldoc-toml--remove-comment t/line))))
+             ;; Return nil if we reached the beginning of the buffer without any matching line
+             (when (<= (line-number-at-pos) 1)
+               (cl-return nil))
 
-                   ;; Return nil if we reached the beginning of the buffer without any matching line
-                   (when (<= (line-number-at-pos) 1)
-                     (cl-return nil))
+             (forward-line -1)
 
-                   (forward-line -1)))
-
-    (goto-char initial-point)
-
-    t/result))
+             (setq line (thing-at-point 'line 'no-properties)))))
 
 (defun eldoc-toml--current-key-name ()
   "Return the current key name.
 Looks for a line that looks like xxx = yyy, and extracts xxx.
 If no such line was found (meaning we're at the top of the doc), returns nil."
-  (let ((initial-point (point)))
-    (defvar k/line)
-    (defvar k/result)
+  (save-excursion
+    ;; Iterate from current line backwards until we see key definition: xxx = ...
+    (cl-loop with line = (thing-at-point 'line 'no-properties) do
 
-    (setq k/result
-          ;; Iterate from current line backwards until we see key definition: xxx = ...
-          (cl-loop (setq k/line (thing-at-point 'line 'no-properties))
+             ;; Return line if it's a decleration line
+             (when (string-match-p ".+\s*=" line)
+               ;; Remove everything in the matching line except the key name
+               (cl-return (string-trim (replace-regexp-in-string "\s*=.*" "" line))))
 
-                   ;; Return line if it's a decleration line
-                   (when (string-match-p ".+\s*=" k/line)
-                     ;; Remove everything in the matching line except the key name
-                     (cl-return (string-trim (replace-regexp-in-string "\s*=.*" "" k/line))))
+             ;; Return nil if we reached the beginning of the buffer without any matching line
+             (when (<= (line-number-at-pos) 1)
+               (cl-return nil))
 
-                   ;; Return nil if we reached the beginning of the buffer without any matching line
-                   (when (<= (line-number-at-pos) 1)
-                     (cl-return nil))
+             ;; Return nil if we aren't inside a long string/array/inline table
+             (when (eldoc-toml--toplevel-p)
+               (cl-return nil))
 
-                   ;; Return nil if we aren't inside a long string/array/inline table
-                   (when (eldoc-toml--toplevelp)
-                     (cl-return nil))
+             (forward-line -1)
 
-                   (forward-line -1)))
+             (setq line (thing-at-point 'line 'no-properties)))))
 
-    (goto-char initial-point)
-
-    k/result))
-
-(defun eldoc-toml--toplevelp ()
+(defun eldoc-toml--toplevel-p ()
   "Check if we're surrounded by brackets, parens, quotes...
 Merely checks if `backward-up-list' says we're at the top level or not.
 Returns t if we're at the top level, returns nil if we're surrounded by something."
-  (let ((initial-point (point)))
-    (defvar s/result)
-
+  (save-excursion
     (beginning-of-line)
-
-    (setq s/result
-          ;; Evaluates to t if cursor couldn't move out of one level of parentheses/quotes/xxx,
-          ;; meaning it's at the file's top level. Evaluates to nil otherwise.
-          (condition-case nil
-              (progn (backward-up-list 1 t) nil)
-            (scan-error t)))
-
-    (goto-char initial-point)
-
-    s/result))
+    ;; Evaluates to t if cursor couldn't move out of one level of parentheses/quotes/xxx,
+    ;; meaning it's at the file's top level. Evaluates to nil otherwise.
+    (condition-case nil
+        (progn (backward-up-list 1 t) nil)
+      (scan-error t))))
 
 (defun eldoc-toml--callback (callback &rest _more)
   "Document the table the value at point is in and pass it to CALLBACK.
