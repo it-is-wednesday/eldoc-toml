@@ -40,7 +40,8 @@ Returns the table's name. If we aren't under any table (before the first table
 of the file), returns nil."
   (save-excursion
     ;; Iterate from current line backwards until we hit a table line or until the first line
-    (cl-loop with line = (thing-at-point 'line 'no-properties) do
+    (cl-loop with line do
+             (setq line (thing-at-point 'line 'no-properties))
 
              ;; return line if it's a table header
              (when (string-match-p "^\s*\\[" line)
@@ -51,9 +52,7 @@ of the file), returns nil."
              (when (<= (line-number-at-pos) 1)
                (cl-return nil))
 
-             (forward-line -1)
-
-             (setq line (thing-at-point 'line 'no-properties)))))
+             (forward-line -1))))
 
 (defun eldoc-toml--current-key-name ()
   "Return the current key name.
@@ -61,7 +60,8 @@ Looks for a line that looks like xxx = yyy, and extracts xxx.
 If no such line was found (meaning we're at the top of the doc), returns nil."
   (save-excursion
     ;; Iterate from current line backwards until we see key definition: xxx = ...
-    (cl-loop with line = (thing-at-point 'line 'no-properties) do
+    (cl-loop with line do
+             (setq line (thing-at-point 'line 'no-properties))
 
              ;; Return line if it's a decleration line
              (when (string-match-p ".+\s*=" line)
@@ -76,9 +76,7 @@ If no such line was found (meaning we're at the top of the doc), returns nil."
              (when (eldoc-toml--toplevel-p)
                (cl-return nil))
 
-             (forward-line -1)
-
-             (setq line (thing-at-point 'line 'no-properties)))))
+             (forward-line -1))))
 
 (defun eldoc-toml--toplevel-p ()
   "Check if we're surrounded by brackets, parens, quotes...
