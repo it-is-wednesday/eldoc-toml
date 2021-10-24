@@ -47,7 +47,7 @@ of the file), returns nil."
                (cl-return (string-trim (eldoc-toml--remove-comment line))))
 
              ;; Return nil if we reached the beginning of the buffer without any matching line
-             (when (<= (line-number-at-pos) 1)
+             (when (bobp)
                (cl-return nil))
 
              (forward-line -1))))
@@ -67,7 +67,7 @@ If no such line was found (meaning we're at the top of the doc), returns nil."
                (cl-return (string-trim (replace-regexp-in-string "\s*=.*" "" line))))
 
              ;; Return nil if we reached the beginning of the buffer without any matching line
-             (when (<= (line-number-at-pos) 1)
+             (when (bobp)
                (cl-return nil))
 
              ;; Return nil if we aren't inside a long string/array/inline table
