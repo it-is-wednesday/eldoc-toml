@@ -1,8 +1,6 @@
 ;;; eldoc-toml.el --- TOML table name at point for ElDoc -*- lexical-binding: t; -*-
 ;;
-;; Copyright (C) 2020 Ma'or Kadosh
-;;
-;; Author: Ma'or Kadosh <git@avocadosh.xyz>
+;; Author: Maor Kadosh <git@avocadosh.xyz>
 ;; URL: https://github.com/it-is-wednesday/eldoc-toml
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "24.4"))
