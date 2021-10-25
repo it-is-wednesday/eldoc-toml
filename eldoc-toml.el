@@ -10,9 +10,9 @@
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; Commentary:
-;; An ElDoc function for displaying the parent table of the field at point in a TOML file, along the
-;; key name. Makes it easier to navigate tables with many fields, where you might have the table’s
-;; header or the key name off screen while still navigating its fields.
+;; An ElDoc function for displaying the parent table of the field at point in a TOML file, along
+;; the key name. Makes it easier to navigate tables with many fields, where you might have the
+;; table’s header or the key name off screen while still navigating its fields.
 ;;
 ;;; Code:
 
@@ -102,10 +102,12 @@ Add this to `eldoc-documentation-functions'."
                  (concat table (if key (concat "." key)))))))
 
 ;;;###autoload
-(defun eldoc-toml ()
-  "Add the hook to `eldoc-documentation-functions'."
-  (interactive)
-  (add-hook 'eldoc-documentation-functions #'eldoc-toml--callback nil 'local))
+(define-minor-mode eldoc-toml-mode
+  "Indicate table and variable name at point in a TOML document."
+  :lighter "eldoc-toml"
+  (if eldoc-toml-mode
+      (add-hook 'eldoc-documentation-functions #'eldoc-toml--callback nil 'local)
+    (remove-hook 'eldoc-documentation-functions #'eldoc-toml--callback 'local)))
 
 (provide 'eldoc-toml)
 ;;; eldoc-toml.el ends here

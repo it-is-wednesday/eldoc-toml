@@ -10,5 +10,5 @@ table's header or the key name off screen while still navigating its fields.
 ** Setup
 After installing from [[https://melpa.org/#/eldoc-toml][melpa]]:
 #+BEGIN_SRC emacs-lisp
-(add-hook 'conf-toml-mode-hook #'eldoc-toml)
+(add-hook 'conf-toml-mode-hook #'eldoc-toml-mode)
 #+END_SRC
