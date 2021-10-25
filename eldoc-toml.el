@@ -88,6 +88,7 @@ Returns t if we're at the top level, returns nil if we're surrounded by somethin
         (progn (backward-up-list 1 t) nil)
       (scan-error t))))
 
+;;;###autoload
 (defun eldoc-toml--callback (callback &rest _more)
   "Document the table the value at point is in and pass it to CALLBACK.
 Add this to `eldoc-documentation-functions'."
@@ -106,8 +107,8 @@ Add this to `eldoc-documentation-functions'."
   "Indicate table and variable name at point in a TOML document."
   :lighter "eldoc-toml"
   (if eldoc-toml-mode
-      (add-hook 'eldoc-documentation-functions #'eldoc-toml--callback nil 'local)
-    (remove-hook 'eldoc-documentation-functions #'eldoc-toml--callback 'local)))
+      (remove-hook 'eldoc-documentation-functions #'eldoc-toml--callback 'local)
+    (add-hook 'eldoc-documentation-functions #'eldoc-toml--callback nil 'local)))
 
 (provide 'eldoc-toml)
 ;;; eldoc-toml.el ends here
