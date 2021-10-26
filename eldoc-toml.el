@@ -107,8 +107,8 @@ Add this to `eldoc-documentation-functions'."
   "Indicate table and variable name at point in a TOML document."
   :lighter "eldoc-toml"
   (if eldoc-toml-mode
-      (remove-hook 'eldoc-documentation-functions #'eldoc-toml--callback 'local)
-    (add-hook 'eldoc-documentation-functions #'eldoc-toml--callback nil 'local)))
+      (add-hook 'eldoc-documentation-functions #'eldoc-toml--callback nil 'local)
+    (remove-hook 'eldoc-documentation-functions #'eldoc-toml--callback 'local)))
 
 (provide 'eldoc-toml)
 ;;; eldoc-toml.el ends here
